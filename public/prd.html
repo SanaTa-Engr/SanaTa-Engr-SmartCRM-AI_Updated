@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCRM AI - Product Requirements Document (PRD) v3.0</title>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; color: #000 !important; font-size: 11pt !important; }
+      .container { max-width: 100% !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+      .page-break { page-break-before: always; }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f1f5f9;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+      padding: 50px 60px;
+    }
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-primary {
+      background: #4f46e5;
+      color: #ffffff;
+      border: 1px solid #4338ca;
+    }
+    .btn-primary:hover {
+      background: #4338ca;
+    }
+    .btn-secondary {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+    .header-bar {
+      border-left: 5px solid #4f46e5;
+      padding-left: 20px;
+      margin-bottom: 30px;
+    }
+    .app-title {
+      font-size: 30px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+    .doc-subtitle {
+      font-size: 18px;
+      font-weight: 700;
+      color: #4f46e5;
+      margin-top: 4px;
+    }
+    .meta-bar {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 8px;
+    }
+    .callout {
+      background: #f8fafc;
+      border-left: 4px solid #4f46e5;
+      border-radius: 0 8px 8px 0;
+      padding: 20px 24px;
+      margin: 24px 0;
+    }
+    .callout h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+    .callout p {
+      font-size: 13.5px;
+      color: #334155;
+      line-height: 1.55;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 750;
+      color: #0f172a;
+      margin: 36px 0 16px 0;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+    h3 {
+      font-size: 15.5px;
+      font-weight: 650;
+      color: #1e293b;
+      margin: 20px 0 10px 0;
+    }
+    p, li {
+      font-size: 13.5px;
+      color: #334155;
+      line-height: 1.65;
+    }
+    ul {
+      margin-left: 20px;
+      margin-bottom: 14px;
+    }
+    li {
+      margin-bottom: 7px;
+    }
+    strong {
+      color: #0f172a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 26px 0;
+      font-size: 12.5px;
+    }
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border: 1px solid #e2e8f0;
+    }
+    th {
+      background: #0f172a;
+      color: #ffffff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+    .badge-green {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #475569;
+    }
+    footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-actions no-print">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="badge badge-green">Updated for v3.0</span>
+        <span class="badge">Google Maps Integrated</span>
+        <span style="font-size: 12px; color: #64748b;">Comprehensive PRD</span>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <a href="/SmartCRM_AI_Product_Requirements_Document.pdf" download class="btn btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF Document
+        </a>
+        <button onclick="window.print()" class="btn btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / Save via Browser
+        </button>
+      </div>
+    </div>
+
+    <div class="header-bar">
+      <h1 class="app-title">SmartCRM AI</h1>
+      <div class="doc-subtitle">Product Requirements Document (PRD) — Release 3.0</div>
+      <div class="meta-bar">Document Version 3.0 &bull; Target Audience: Product Management, Engineering, RevOps, Sales Leadership &bull; Updated: October 2026</div>
+    </div>
+
+    <div class="callout">
+      <h4>Executive Summary</h4>
+      <p>SmartCRM AI is an intelligent, high-velocity customer relationship management platform engineered for modern B2B sales organizations, revenue operations (RevOps), account executives (AEs), and sales development reps (SDRs). Version 3.0 introduces real-time <strong>Google Maps Platform Lead Discovery & Interactive Spatial Intelligence</strong> alongside an overhauled, crystal-clear <strong>Sales Pipeline Funnel</strong>, bulk CSV/Excel ingestion, and Google Gemini AI automated scoring, instant profile dossiers, and conversational sales copilot capabilities.</p>
+    </div>
+
+    <h2>1. Product Vision & Strategic Objectives</h2>
+    <p>Traditional CRMs act as passive, retrospective digital filing cabinets that require extensive administrative data entry while providing little proactive guidance. SmartCRM AI re-architects the CRM into an active revenue acceleration engine that surfaces verified local and enterprise leads, scores them with predictive intelligence, and moves them across a transparent pipeline with minimal friction.</p>
+
+    <h3>1.1 Core Value Drivers</h3>
+    <ul>
+      <li><strong>Google Maps Geospatial Prospecting:</strong> Discovers live, verified local businesses and commercial prospects via the modern Google Places API (New) and renders them on an interactive Google Map with custom markers, instant InfoWindows, and 1-click CRM conversion.</li>
+      <li><strong>Crystal-Clear Sales Funnel:</strong> Visualizes deal flow through an intuitive 5-step progression funnel (New Inbound &rarr; Contacted &rarr; Qualified &rarr; Proposal Sent &rarr; Closed Won) with stage definitions, column value aggregates, and 1-click stage advancement buttons.</li>
+      <li><strong>Predictive Lead Triage:</strong> Quantitatively evaluates prospects on a 0-100 scale using firmographics, budget tier, and intent signals, generating human-readable reasoning and prescriptive next steps.</li>
+      <li><strong>High-Throughput File Ingestion:</strong> Ingests up to 10MB of CSV and Microsoft Excel data with automatic column mapping, duplicate detection, and audit history.</li>
+      <li><strong>Zero-Friction Outreach:</strong> Generates multi-tone personalized sales outreach and executive meeting summaries in sub-second latency.</li>
+    </ul>
+
+    <h3>1.2 Target Success Metrics & KPIs</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Metric / KPI</th>
+          <th>Historical Baseline</th>
+          <th>SmartCRM AI Target</th>
+          <th>Measurement Methodology</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Daily CRM Admin Time</td>
+          <td>45 mins / sales rep / day</td>
+          <td>&lt; 15 mins / rep / day</td>
+          <td>Application session telemetry</td>
+        </tr>
+        <tr>
+          <td>Prospect Discovery to CRM Ingestion</td>
+          <td>20 mins per 10 prospects (manual copy-paste)</td>
+          <td>&lt; 10 seconds (Google Maps 1-click / bulk add)</td>
+          <td>Google Maps lead creation logs</td>
+        </tr>
+        <tr>
+          <td>Lead Qualification Speed</td>
+          <td>4-8 hours post-submission</td>
+          <td>&lt; 5 minutes</td>
+          <td>Timestamp from creation to qualification</td>
+        </tr>
+        <tr>
+          <td>Outreach Drafting Latency</td>
+          <td>15 mins / personalized email</td>
+          <td>&lt; 30 seconds</td>
+          <td>AI email generation events</td>
+        </tr>
+        <tr>
+          <td>Pipeline Stage Clarity & Conversion</td>
+          <td>Stale leads abandoned across vague stages</td>
+          <td>&gt; 92% active stage accountability</td>
+          <td>Kanban stage transition activity audits</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2. User Personas & Core Journeys</h2>
+    <h3>2.1 Field Sales & Territory Account Executives (AEs)</h3>
+    <ul>
+      <li><strong>Primary Need:</strong> Discovering local businesses in target geographic territories, mapping prospect routes, qualifying commercial opportunities, and advancing deals quickly to close.</li>
+      <li><strong>Key Workflows:</strong> Searching Google Maps for businesses in specific cities, reviewing ratings and website footprints, converting top prospects with 1-click into the CRM, and utilizing the clear 5-stage sales funnel to close contracts.</li>
+    </ul>
+
+    <h3>2.2 Sales Development Representatives (SDRs)</h3>
+    <ul>
+      <li><strong>Primary Need:</strong> High-volume lead discovery, contact validation, automated triage, and personalized outbound follow-ups.</li>
+      <li><strong>Key Workflows:</strong> Using Google Maps niche presets (e.g. Restaurants, Law Firms, Tech Agencies) to bulk-import 20+ leads at once, running AI Predictive Fit Scoring, and generating tailored cold emails.</li>
+    </ul>
+
+    <h3>2.3 VP of Sales & Revenue Operations (RevOps)</h3>
+    <ul>
+      <li><strong>Primary Need:</strong> Pipeline accuracy, predictable revenue forecasting, duplicate prevention, and clean data hygiene.</li>
+      <li><strong>Key Workflows:</strong> Monitoring total pipeline value across stages, reviewing conversion drop-offs in the funnel bar, and auditing imported lead sources.</li>
+    </ul>
+
+    <h2>3. System Architecture & Technical Specifications</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Functionality</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frontend Application</td>
+          <td>React 19, TypeScript, Tailwind CSS v4, Lucide React, Recharts</td>
+          <td>Responsive single-page application with split-view layout, real-time filters, and sub-100ms interactions</td>
+        </tr>
+        <tr>
+          <td>Google Maps Platform</td>
+          <td>@vis.gl/react-google-maps, Google Places API (New)</td>
+          <td>Official React SDK, &lt;APIProvider&gt;, &lt;Map&gt; (mapId: DEMO_MAP_ID), &lt;AdvancedMarker&gt;, &lt;Pin&gt;, &lt;InfoWindow&gt;, Text Search REST API</td>
+        </tr>
+        <tr>
+          <td>Backend Server & Proxy</td>
+          <td>Express 4, Node.js, TSX Runtime</td>
+          <td>REST API endpoints, Google Maps proxying with server-side API key protection, duplicate detection, and file parsing</td>
+        </tr>
+        <tr>
+          <td>AI Intelligence Engine</td>
+          <td>Google Gemini 3.8 Flash SDK (@google/genai)</td>
+          <td>Predictive lead qualification scoring, email generator, executive dossiers, and conversational sales copilot</td>
+        </tr>
+        <tr>
+          <td>Persistence Layer</td>
+          <td>Dual-mode: JSON file store + Supabase PostgreSQL with RLS</td>
+          <td>Zero-configuration local storage with full relational schema, ACID guarantees, and cloud multi-tenancy</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Detailed Functional Requirements</h2>
+
+    <h3>4.1 Google Maps Lead Discovery & Spatial Intelligence</h3>
+    <ul>
+      <li><strong>Official SDK Integration:</strong> Powered by <code>@vis.gl/react-google-maps</code> with <code>APIProvider</code>, <code>Map</code> (using <code>DEMO_MAP_ID</code> and internal usage attribution <code>gmp_mcp_codeassist_v1_aistudio</code>), and <code>AdvancedMarker</code> elements.</li>
+      <li><strong>Modern Places API (New):</strong> Discovers commercial prospects using the <code>https://places.googleapis.com/v1/places:searchText</code> REST endpoint with strict field masking for efficiency and cost optimization.</li>
+      <li><strong>Interactive Synchronization:</strong> Hovering or selecting any lead card in the sidebar highlights the corresponding pin on Google Maps with a glowing pulsing ring; clicking any marker pans the camera, opens a rich InfoWindow, and scrolls the card into view.</li>
+      <li><strong>Visual Pin Status:</strong> Unsaved businesses feature high-contrast indigo pins; businesses already active in the CRM pipeline display emerald pins with verified checkmark glyphs.</li>
+      <li><strong>Rich InfoWindow:</strong> Displays business name, category pill, star rating with review count, formatted physical address, direct phone link (<code>tel:</code>), website link, Google Maps navigation link, and 1-click "+ Add to Leads Pipeline" action.</li>
+      <li><strong>Niche & Location Presets:</strong> Instant 1-click industry buttons (<em>Restaurants</em>, <em>Cafes & Bakeries</em>, <em>Software & Tech</em>, <em>Real Estate</em>, <em>Dental Clinics</em>, <em>Law Firms</em>, <em>Retail Boutiques</em>, <em>Gyms & Fitness</em>) and target city presets (<em>San Francisco</em>, <em>Austin</em>, <em>New York</em>, <em>Chicago</em>, <em>Miami</em>, <em>Seattle</em>).</li>
+      <li><strong>Discovery Filters:</strong> Filter by Minimum Star Rating (4.0+, 4.5+, 4.8+), Has Phone Number, Has Website, and Unsaved Leads Only; sort by Top Rated, Most Reviews, or Company Name.</li>
+      <li><strong>3-Way View Layouts:</strong> Responsive toggle between <strong>Split View</strong> (sidebar list + interactive map), <strong>Map Only</strong> (fullscreen interactive map), and <strong>List Only</strong>.</li>
+      <li><strong>Bulk Lead Ingestion:</strong> "Add All (X) to Pipeline" button allowing one-click batch import of all visible Google Maps prospects with automated deal value estimation and initial AI fit scores.</li>
+      <li><strong>Duplicate Prevention:</strong> Prevents duplicate lead records by verifying both Google Maps <code>placeId</code> and normalized company name against existing CRM records.</li>
+    </ul>
+
+    <h3>4.2 Transparent Sales Pipeline & Lead Management</h3>
+    <ul>
+      <li><strong>Interactive Pipeline Stepper Funnel:</strong> Top-level visual funnel banner showing the 5 progressive stages:
+        <br/><code>Step 1: New Inbound</code> &rarr; <code>Step 2: Contacted</code> &rarr; <code>Step 3: Qualified</code> &rarr; <code>Step 4: Proposal Sent</code> &rarr; <code>Step 5: Closed Won</code> (plus <code>Closed Lost</code>).
+      </li>
+      <li><strong>Clear Stage Definitions:</strong> Each Kanban column header explicitly defines its qualification criteria (e.g. "Budget, authority & interest verified") alongside total deal count and aggregate dollar volume.</li>
+      <li><strong>1-Click Stage Advancement:</strong> Prominent forward action buttons on each card (e.g., <em>Advance to Contacted &rarr;</em>, <em>Advance to Qualified &rarr;</em>, <em>Send Proposal &rarr;</em>, <em>Mark Won &hearts;</em>) and back-step arrow (<em>&larr;</em>), removing friction from moving deals through the funnel.</li>
+      <li><strong>Google Maps Origin Tagging:</strong> Leads discovered via Google Maps display a distinct <code>&bull; Google Maps</code> pill, address preview, and direct link to open the live business listing on Google Maps.</li>
+      <li><strong>Predictive AI Fit Scoring:</strong> Prospects are scored 0-100 with color-coded badges (<em>High Fit 80-100</em> in green, <em>Good Fit 60-79</em> in amber, <em>Low Fit</em> in slate) with natural-language reasoning and next-step recommendations.</li>
+      <li><strong>Smart Sales Actions:</strong> Single-click triggers for AI Profile Dossier, AI Follow-Up Email Drafter, Lead Editing, and Deletion.</li>
+      <li><strong>Dense Table View:</strong> Tabular representation with sortable columns, location links, deal values, and quick stage transition triggers.</li>
+    </ul>
+
+    <h3>4.3 Automated Bulk Lead Import Engine (CSV / XLSX)</h3>
+    <ul>
+      <li><strong>File Ingestion:</strong> Native client/server parsing of CSV and Microsoft Excel (.xlsx/.xls) files up to 10MB.</li>
+      <li><strong>Header Auto-Mapping:</strong> Automatic matching of incoming spreadsheet headers to CRM fields with interactive dropdown overrides.</li>
+      <li><strong>Source Normalization:</strong> Enforces standard sales channels: <em>Inbound Web</em>, <em>Outbound SDR</em>, <em>Referral</em>, <em>Partner Ecosystem</em>, <em>Conference</em>, and <em>Google Maps</em>.</li>
+      <li><strong>Real-Time Deduplication:</strong> Prevents duplicates across existing CRM databases and internal spreadsheet rows.</li>
+      <li><strong>Interactive Preview:</strong> Color-coded breakdown of valid, duplicate, and invalid rows with descriptive error flags.</li>
+      <li><strong>Audit Ledger:</strong> Persistent history tracking import dates, filenames, success counts, and error reports.</li>
+    </ul>
+
+    <h3>4.4 Deal Pipeline & Revenue Forecasting</h3>
+    <ul>
+      <li><strong>Deal Stages:</strong> Discovery &rarr; Demo Scheduled &rarr; Proposal Sent &rarr; Negotiation &rarr; Closed Won / Lost.</li>
+      <li><strong>Weighted Revenue Forecasts:</strong> Calculates probability-adjusted pipeline totals for executive financial forecasting.</li>
+      <li><strong>Deal Risk Analyzer:</strong> Flags stagnant deals and provides AI deal-winning recommendations.</li>
+    </ul>
+
+    <h3>4.5 AI Sales Copilot</h3>
+    <ul>
+      <li><strong>Conversational Sidebar Copilot:</strong> Always-on AI assistant grounded in real-time pipeline metrics, deal statuses, and contact accounts.</li>
+      <li><strong>Capabilities:</strong> Answering pipeline queries, drafting bespoke sales proposals, identifying at-risk deals, and coaching sales tactics.</li>
+    </ul>
+
+    <h2>5. Security, Data Privacy & Governance</h2>
+    <ul>
+      <li><strong>Zero Client-Side Secret Exposure:</strong> Google Maps Platform API keys and Gemini API credentials are maintained on the backend proxy server and never exposed in client bundles.</li>
+      <li><strong>Multi-Tenant Data Isolation:</strong> Supabase Row Level Security (RLS) policies enforce strict per-user boundaries (<code>auth.uid() = user_id</code>).</li>
+      <li><strong>Input Sanitization:</strong> Strict payload caps, MIME-type checks, and regex validation on all search and import endpoints.</li>
+    </ul>
+
+    <h2>6. Non-Functional Requirements (NFRs)</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Requirement Specification</th>
+          <th>Verification Method</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Performance</td>
+          <td>Map initialization &lt; 500ms; Places search response &lt; 800ms; UI transitions &lt; 100ms</td>
+          <td>Lighthouse & browser performance traces</td>
+        </tr>
+        <tr>
+          <td>Availability</td>
+          <td>99.9% uptime with offline fallback mode and local JSON data persistence</td>
+          <td>Automated healthcheck polling (/api/health)</td>
+        </tr>
+        <tr>
+          <td>Scalability</td>
+          <td>Support 10,000+ active contacts and 5,000+ leads per account without UI stutter</td>
+          <td>Stress-testing data layers</td>
+        </tr>
+        <tr>
+          <td>Compliance</td>
+          <td>Zero deprecated Google Maps APIs; compliant with Google Maps Terms of Service</td>
+          <td>Internal usage attribution & audit checks</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>7. Release History & Version Roadmap</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Version</th>
+          <th>Release Date</th>
+          <th>Milestone Capabilities</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v1.0</td>
+          <td>July 2026</td>
+          <td>Initial CRM MVP: Contacts, Companies, basic Leads list, and Deal tracking</td>
+        </tr>
+        <tr>
+          <td>v2.0</td>
+          <td>August 2026</td>
+          <td>Gemini AI Integration: Lead scoring, email generator, and executive dashboard</td>
+        </tr>
+        <tr>
+          <td>v2.4</td>
+          <td>September 2026</td>
+          <td>Automated Bulk Lead Import Engine (CSV/Excel) with header mapping and deduplication</td>
+        </tr>
+        <tr>
+          <td><strong>v3.0 (Current)</strong></td>
+          <td><strong>October 2026</strong></td>
+          <td><strong>Google Maps Platform Lead Discovery, Interactive Spatial Map View (@vis.gl/react-google-maps), and Overhauled 5-Stage Sales Funnel with 1-Click Advancement</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer>
+      <span>SmartCRM AI &bull; Product Requirements Document (PRD)</span>
+      <span>Confidential &bull; Version 3.0 &bull; October 2026</span>
+    </footer>
+  </div>
+</body>
+</html>

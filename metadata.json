@@ -1,0 +1,6 @@
+{
+  "name": "SmartCRM AI",
+  "description": "An AI-powered CRM web application featuring intelligent lead scoring, pipeline management, contacts, companies, deals, tasks, and analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
