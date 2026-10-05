@@ -375,8 +375,8 @@ app.get(['/api/maps/status', '/maps/status'], (req, res) => {
 });
 
 app.get(['/api/maps/config', '/maps/config'], (req, res) => {
-  const apiKey = getGoogleMapsApiKey();
-  res.json({ apiKey: apiKey || '' });
+  const isConfigured = Boolean(getGoogleMapsApiKey());
+  res.json({ configured: isConfigured });
 });
 
 app.get(['/api/maps/search', '/maps/search'], async (req, res) => {
@@ -401,13 +401,15 @@ app.get(['/api/maps/search', '/maps/search'], async (req, res) => {
 
     res.json({
       ...result,
+      source: 'google_places',
       places: annotatedPlaces,
     });
   } catch (err: any) {
     res.status(500).json({
       success: false,
+      source: 'google_places',
       places: [],
-      error: err.message || 'Internal server error while searching places',
+      error: 'Unable to retrieve verified Google Places results. Please try again.',
     });
   }
 });
@@ -434,13 +436,15 @@ app.post(['/api/maps/search', '/maps/search'], async (req, res) => {
 
     res.json({
       ...result,
+      source: 'google_places',
       places: annotatedPlaces,
     });
   } catch (err: any) {
     res.status(500).json({
       success: false,
+      source: 'google_places',
       places: [],
-      error: err.message || 'Internal server error while searching places',
+      error: 'Unable to retrieve verified Google Places results. Please try again.',
     });
   }
 });

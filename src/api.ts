@@ -175,27 +175,25 @@ function handleClientFallback<T>(path: string, options: RequestInit = {}): T {
   // Google Maps Lead Discovery
   if (cleanPath === '/api/maps/status' || cleanPath === '/maps/status') {
     return {
-      configured: true,
-      hasKey: true,
+      configured: false,
       message: 'Google Places Lead Search API ready',
     } as unknown as T;
   }
   if (cleanPath === '/api/maps/config' || cleanPath === '/maps/config') {
     return {
-      apiKey: (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || '',
+      configured: false,
     } as unknown as T;
   }
   if (cleanPath === '/api/maps/search' || cleanPath === '/maps/search') {
-    const kw = params.get('keyword') || params.get('query') || 'restaurants';
-    const loc = params.get('location') || 'San Francisco, CA';
-    const places = generateClientCuratedPlaces(kw, loc);
     return {
-      success: true,
-      places,
-      query: kw,
-      location: loc,
-      totalCount: places.length,
-      configured: true,
+      success: false,
+      source: 'google_places',
+      places: [],
+      query: params.get('keyword') || params.get('query') || '',
+      location: params.get('location') || '',
+      totalCount: 0,
+      configured: false,
+      error: 'Unable to retrieve verified Google Places results. Please try again.',
     } as unknown as T;
   }
   if (cleanPath === '/api/leads/from-map' || cleanPath === '/leads/from-map') {
@@ -239,194 +237,6 @@ function handleClientFallback<T>(path: string, options: RequestInit = {}): T {
   return {} as T;
 }
 
-// Client-side City Coordinates for accurate geolocation fallback
-const CLIENT_CITY_COORDINATES: Record<string, { lat: number; lng: number; streets: string[]; areaCode: string }> = {
-  'san francisco': {
-    lat: 37.7749,
-    lng: -122.4194,
-    streets: ['Valencia St', 'Market St', 'Montgomery St', 'Columbus Ave', 'Mission St', 'Geary Blvd', 'California St'],
-    areaCode: '415',
-  },
-  'new york': {
-    lat: 40.7128,
-    lng: -74.006,
-    streets: ['Broadway', '5th Ave', 'Madison Ave', 'Lexington Ave', 'Spring St', 'Bowery', 'Wall St'],
-    areaCode: '212',
-  },
-  'austin': {
-    lat: 30.2672,
-    lng: -97.7431,
-    streets: ['Congress Ave', '6th St', 'Rainey St', 'Barton Springs Rd', 'Guadalupe St', 'Lamar Blvd'],
-    areaCode: '512',
-  },
-  'chicago': {
-    lat: 41.8781,
-    lng: -87.6298,
-    streets: ['Michigan Ave', 'State St', 'Wacker Dr', 'Clark St', 'Halsted St', 'Randolph St'],
-    areaCode: '312',
-  },
-  'miami': {
-    lat: 25.7617,
-    lng: -80.1918,
-    streets: ['Biscayne Blvd', 'Brickell Ave', 'Ocean Dr', 'Collins Ave', 'Calle Ocho', 'Coral Way'],
-    areaCode: '305',
-  },
-  'seattle': {
-    lat: 47.6062,
-    lng: -122.3321,
-    streets: ['Pike St', 'Pine St', '1st Ave', 'Westlake Ave', 'Mercer St', 'Broadway'],
-    areaCode: '206',
-  },
-};
-
-export function generateClientCuratedPlaces(keyword: string, location?: string): MapLeadPlace[] {
-  const cleanKw = (keyword || 'business').trim();
-  const cleanLoc = (location || 'San Francisco, CA').trim();
-  const locLower = cleanLoc.toLowerCase();
-
-  let matchedCityKey = Object.keys(CLIENT_CITY_COORDINATES).find(c => locLower.includes(c));
-  if (!matchedCityKey) matchedCityKey = 'san francisco';
-  const cityData = CLIENT_CITY_COORDINATES[matchedCityKey];
-
-  const capitalizedKw = cleanKw.charAt(0).toUpperCase() + cleanKw.slice(1);
-
-  const businessNames = [
-    `${capitalizedKw} Artisans & Co.`,
-    `Apex ${capitalizedKw} Group`,
-    `The ${cleanLoc.split(',')[0]} ${capitalizedKw} Hub`,
-    `Vanguard ${capitalizedKw} Solutions`,
-    `Heritage ${capitalizedKw} Studio`,
-    `Boutique ${capitalizedKw} Collective`,
-    `Pacific ${capitalizedKw} Partners`,
-    `Summit ${capitalizedKw} Enterprise`,
-    `Sterling & Stone ${capitalizedKw}`,
-    `Foundry ${capitalizedKw} Works`,
-  ];
-
-  return businessNames.map((name, i) => {
-    const latOffset = (Math.random() - 0.5) * 0.04;
-    const lngOffset = (Math.random() - 0.5) * 0.04;
-    const street = cityData.streets[i % cityData.streets.length];
-    const streetNum = 100 + i * 85;
-    const address = `${streetNum} ${street}, ${cleanLoc}`;
-    const rating = +(4.3 + Math.random() * 0.6).toFixed(1);
-    const reviews = Math.floor(45 + Math.random() * 450);
-    const phone = `+1 (${cityData.areaCode}) ${Math.floor(200 + Math.random() * 700)}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const cleanDomain = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const website = `https://www.${cleanDomain}.com`;
-    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + address)}`;
-
-    return {
-      id: `place-client-${cleanDomain}-${i}`,
-      name,
-      formattedAddress: address,
-      phone,
-      websiteUri: website,
-      rating,
-      userRatingCount: reviews,
-      googleMapsUri: mapsUrl,
-      category: capitalizedKw,
-      location: {
-        latitude: +(cityData.lat + latOffset).toFixed(5),
-        longitude: +(cityData.lng + lngOffset).toFixed(5),
-      },
-    };
-  });
-}
-
-export async function searchGooglePlacesClient(
-  keyword: string,
-  location?: string
-): Promise<MapSearchResponse> {
-  const cleanKeyword = (keyword || '').trim();
-  const cleanLocation = (location || '').trim();
-  const textQuery = cleanLocation ? `${cleanKeyword} in ${cleanLocation}` : cleanKeyword;
-
-  if (!textQuery) {
-    return {
-      success: false,
-      places: [],
-      query: cleanKeyword,
-      location: cleanLocation,
-      totalCount: 0,
-      configured: true,
-      error: 'Please enter a search keyword or location.',
-    };
-  }
-
-  const apiKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY || '';
-
-  if (apiKey) {
-    try {
-      const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Goog-Api-Key': apiKey,
-          'X-Goog-FieldMask':
-            'places.id,places.displayName,places.formattedAddress,places.nationalPhoneNumber,places.websiteUri,places.rating,places.userRatingCount,places.googleMapsUri,places.primaryTypeDisplayName,places.location',
-        },
-        body: JSON.stringify({
-          textQuery,
-          pageSize: 20,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const rawPlaces = data.places || [];
-        if (rawPlaces.length > 0) {
-          const places: MapLeadPlace[] = rawPlaces.map((p: any) => {
-            const name = p.displayName?.text || 'Business';
-            const address = p.formattedAddress || '';
-            const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + address)}`;
-
-            return {
-              id: p.id || 'place-' + Math.random().toString(36).substring(2, 9),
-              name,
-              formattedAddress: address,
-              phone: p.nationalPhoneNumber || '',
-              websiteUri: p.websiteUri || '',
-              rating: typeof p.rating === 'number' ? p.rating : undefined,
-              userRatingCount: typeof p.userRatingCount === 'number' ? p.userRatingCount : undefined,
-              googleMapsUri: p.googleMapsUri || fallbackUrl,
-              category: p.primaryTypeDisplayName?.text || cleanKeyword || 'Business',
-              location: p.location
-                ? {
-                    latitude: p.location.latitude,
-                    longitude: p.location.longitude,
-                  }
-                : undefined,
-            };
-          });
-
-          return {
-            success: true,
-            places,
-            query: cleanKeyword,
-            location: cleanLocation,
-            totalCount: places.length,
-            configured: true,
-          };
-        }
-      }
-    } catch (clientErr) {
-      console.warn('[SmartCRM] Direct client Places API error, using curated verified places:', clientErr);
-    }
-  }
-
-  // If Google API returned 0 results or had any network/CORS issue, generate verified curated places
-  const samplePlaces = generateClientCuratedPlaces(cleanKeyword, cleanLocation);
-  return {
-    success: true,
-    places: samplePlaces,
-    query: cleanKeyword,
-    location: cleanLocation,
-    totalCount: samplePlaces.length,
-    configured: true,
-  };
-}
-
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -449,17 +259,46 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       return await res.json();
     }
 
-    // If 404 or HTML response (like Vercel static "The page could not be found")
+    // If 404 or HTML response (like Vercel static fallback)
     if (res.status === 404 || !contentType.includes('application/json')) {
+      if (path.includes('/maps/search')) {
+        return {
+          success: false,
+          source: 'google_places',
+          places: [],
+          totalCount: 0,
+          configured: false,
+          error: 'Unable to retrieve verified Google Places results. Please try again.',
+        } as unknown as T;
+      }
       console.warn(`[SmartCRM] Backend returned ${res.status} (${contentType}) for ${path}. Using client storage engine.`);
       return handleClientFallback<T>(path, options);
     }
 
-    // If server returned another error (e.g. 500), try to get error json
+    // If server returned another error status (e.g. 500)
     const errData = await res.json().catch(() => ({ error: `Request failed with status ${res.status}` }));
+    if (path.includes('/maps/search')) {
+      return {
+        success: false,
+        source: 'google_places',
+        places: [],
+        totalCount: 0,
+        configured: Boolean(errData.configured),
+        error: errData.error || 'Unable to retrieve verified Google Places results. Please try again.',
+      } as unknown as T;
+    }
     throw new Error(errData.error || `Request failed with status ${res.status}`);
   } catch (networkErr: any) {
-    // If network failure or offline, transparently fall back
+    if (path.includes('/maps/search')) {
+      return {
+        success: false,
+        source: 'google_places',
+        places: [],
+        totalCount: 0,
+        configured: false,
+        error: 'Unable to retrieve verified Google Places results. Please try again.',
+      } as unknown as T;
+    }
     console.warn(`[SmartCRM] Network fetch failed for ${path}. Using client storage engine:`, networkErr.message);
     return handleClientFallback<T>(path, options);
   }
@@ -701,11 +540,11 @@ export const api = {
 
   // Google Maps Lead Discovery
   async getMapsStatus() {
-    return request<{ configured: boolean; hasKey: boolean; maskedKey?: string; message: string }>('/api/maps/status');
+    return request<{ configured: boolean; message: string }>('/api/maps/status');
   },
 
   async getMapsConfig() {
-    return request<{ apiKey: string }>('/api/maps/config');
+    return request<{ configured: boolean }>('/api/maps/config');
   },
 
   async searchMapLeads(keyword: string, location?: string): Promise<MapSearchResponse> {
@@ -713,18 +552,7 @@ export const api = {
     if (keyword) params.set('keyword', keyword);
     if (location) params.set('location', location);
 
-    try {
-      const res = await request<MapSearchResponse>(`/api/maps/search?${params.toString()}`);
-      if (res && res.success && Array.isArray(res.places) && res.places.length > 0) {
-        return res;
-      }
-      // If server returned 0 results or had issues, query Google Places API directly
-      console.log('[SmartCRM] Backend returned 0 places, calling Google Places API directly from client...');
-      return await searchGooglePlacesClient(keyword, location);
-    } catch (err) {
-      console.warn('[SmartCRM] Backend search failed, falling back to client Google Places API:', err);
-      return await searchGooglePlacesClient(keyword, location);
-    }
+    return request<MapSearchResponse>(`/api/maps/search?${params.toString()}`);
   },
 
   async createLeadFromMap(place: MapLeadPlace) {

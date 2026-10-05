@@ -352,9 +352,8 @@ CREATE TABLE IF NOT EXISTS activities (
         <div className="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl flex items-start gap-3 text-xs text-emerald-950">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="font-bold text-emerald-900">GitHub & Vercel Security Best Practice</p>
             <p className="text-[11px] text-emerald-800 leading-relaxed">
-              Google Maps API keys are <strong>never committed to GitHub</strong> or hardcoded in source files. On Vercel, simply add <code className="bg-emerald-100/80 text-emerald-900 px-1 py-0.5 rounded font-mono font-bold">GOOGLE_MAPS_API_KEY</code> in <em>Project Settings &gt; Environment Variables</em>. The backend proxy securely handles searches and maps configuration while keeping your credentials 100% private.
+              Google Maps API credentials are <strong>never committed to GitHub</strong> or hardcoded in source files. On Vercel, configure your private Google Maps key in <em>Project Settings &gt; Environment Variables</em>. The backend proxy securely handles searches and maps configuration while keeping your credentials 100% private.
             </p>
           </div>
         </div>
