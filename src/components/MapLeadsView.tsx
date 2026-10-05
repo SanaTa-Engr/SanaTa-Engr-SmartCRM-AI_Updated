@@ -75,6 +75,8 @@ export function MapLeadsView({
 
   const [apiConfig, setApiConfig] = useState<{
     configured: boolean;
+    hasKey: boolean;
+    maskedKey?: string;
     message?: string;
   } | null>(null);
 
@@ -117,7 +119,8 @@ export function MapLeadsView({
       .catch(() => {
         setApiConfig({
           configured: false,
-          message: 'Google Places search is not configured.',
+          hasKey: false,
+          message: 'Unable to connect to Google Maps proxy status.',
         });
       });
 
@@ -148,31 +151,24 @@ export function MapLeadsView({
       const response = await api.searchMapLeads(searchKw, searchLoc);
 
       if (response && response.success && Array.isArray(response.places)) {
+        setPlaces(response.places);
         if (response.places.length > 0) {
-          setPlaces(response.places);
           setSelectedPlace(response.places[0]);
           showToast(
             'success',
-            `Found ${response.places.length} verified businesses matching "${searchKw}" in ${searchLoc || 'area'}`
+            `Found ${response.places.length} businesses matching "${searchKw}" in ${searchLoc || 'area'}`
           );
         } else {
-          setPlaces([]);
           setSelectedPlace(null);
-          const emptyMsg = response.error || 'No verified businesses were found for this search.';
-          setErrorMessage(emptyMsg);
-          showToast('info', emptyMsg);
+          showToast('info', `No businesses found matching "${searchKw}". Try a broader location or keyword.`);
         }
       } else {
-        setPlaces([]);
-        setSelectedPlace(null);
-        const errorText = response?.error || 'Unable to retrieve verified Google Places results. Please try again.';
+        const errorText = response?.error || 'Failed to search places on Google Maps';
         setErrorMessage(errorText);
         showToast('error', errorText);
       }
     } catch (err: any) {
-      setPlaces([]);
-      setSelectedPlace(null);
-      const msg = err.message || 'Unable to retrieve verified Google Places results. Please try again.';
+      const msg = err.message || 'An unexpected error occurred during Google Maps search';
       setErrorMessage(msg);
       showToast('error', msg);
     } finally {
@@ -590,13 +586,9 @@ export function MapLeadsView({
             ) : filteredPlaces.length === 0 ? (
               <div className="bg-white p-8 rounded-2xl border border-dashed border-slate-300 text-center">
                 <Building2 className="w-10 h-10 text-slate-400 mx-auto mb-2 opacity-50" />
-                <h3 className="text-sm font-bold text-slate-800">
-                  {errorMessage || 'No verified businesses were found for this search.'}
-                </h3>
+                <h3 className="text-sm font-bold text-slate-800">No Places Found</h3>
                 <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                  {errorMessage
-                    ? 'Verify that Google Places API is configured in your server environment variables.'
-                    : 'Try adjusting your search keywords, location query, or reset applied filters.'}
+                  Try adjusting your filters, searching for a different keyword, or selecting another city.
                 </p>
                 <button
                   onClick={() => {
@@ -631,15 +623,10 @@ export function MapLeadsView({
                     {/* Header: Title, Category, Rating */}
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <div className="flex items-center gap-1.5 mb-1">
                           <span className="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded uppercase tracking-wider">
                             {place.category || 'Local Business'}
                           </span>
-                          {place.source === 'google_places' && (
-                            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                              Google Places
-                            </span>
-                          )}
                           {isSaved && (
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                               <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -653,20 +640,16 @@ export function MapLeadsView({
                       </div>
 
                       {/* Rating pill */}
-                      {place.rating !== undefined ? (
+                      {place.rating !== undefined && (
                         <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 text-amber-900 border border-amber-200 rounded-lg text-xs font-extrabold shrink-0 shadow-2xs">
                           <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                           <span>{place.rating.toFixed(1)}</span>
-                          {place.userRatingCount !== undefined && (
+                          {place.userRatingCount && (
                             <span className="text-[10px] text-amber-700 font-normal">
-                              ({place.userRatingCount.toLocaleString()})
+                              ({place.userRatingCount})
                             </span>
                           )}
                         </div>
-                      ) : (
-                        <span className="text-[11px] text-slate-400 italic shrink-0">
-                          Rating unavailable
-                        </span>
                       )}
                     </div>
 
@@ -680,7 +663,7 @@ export function MapLeadsView({
 
                     {/* Contact row: Phone & Website */}
                     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 py-1">
-                      {place.phone ? (
+                      {place.phone && (
                         <span className="flex items-center gap-1">
                           <Phone className="w-3 h-3 text-slate-400" />
                           <a
@@ -691,14 +674,9 @@ export function MapLeadsView({
                             {place.phone}
                           </a>
                         </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-slate-400 italic">
-                          <Phone className="w-3 h-3 text-slate-300" />
-                          Phone unavailable
-                        </span>
                       )}
 
-                      {place.websiteUri ? (
+                      {place.websiteUri && (
                         <span className="flex items-center gap-1">
                           <Globe className="w-3 h-3 text-slate-400" />
                           <a
@@ -711,15 +689,10 @@ export function MapLeadsView({
                             Website
                           </a>
                         </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-slate-400 italic">
-                          <Globe className="w-3 h-3 text-slate-300" />
-                          Website unavailable
-                        </span>
                       )}
 
                       <a
-                        href={place.googleMapsUri || (place.formattedAddress ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.formattedAddress)}` : '#')}
+                        href={place.googleMapsUri}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}

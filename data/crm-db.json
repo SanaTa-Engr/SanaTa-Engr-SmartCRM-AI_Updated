@@ -393,32 +393,6 @@
   ],
   "leads": [
     {
-      "name": "Monal Lahore",
-      "company": "Monal Lahore",
-      "title": "Restaurant Owner / Manager",
-      "email": "",
-      "phone": "+92 42 35789823",
-      "stage": "New",
-      "estimatedValue": 15000,
-      "source": "Google Maps",
-      "score": 88,
-      "scoreReason": "Discovered on Google Maps. Customer rating: 4.3★ (22746 reviews). High local market presence.",
-      "aiSummary": "Monal Lahore is a local Restaurant located at Plaza Liberty Park and Ride Plaza, Lahore. Captured via Google Maps lead search.",
-      "nextAction": "Initiate discovery outreach & verify decision-maker.",
-      "assignedTo": "You",
-      "address": "Plaza Liberty Park and Ride Plaza, Lahore",
-      "website": "https://themonalgroup.com/",
-      "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Monal%20Lahore%20Plaza%20Liberty%20Park%20and%20Ride%20Plaza%2C%20Lahore",
-      "mapsPlaceId": "ChIJZXoLgFwEGTkRpO78fFNa_ps",
-      "category": "Restaurant",
-      "rating": 4.3,
-      "userRatingsTotal": 22746,
-      "id": "lead-1f23f7da",
-      "userId": "usr-demo-1",
-      "createdAt": "2026-10-05T14:28:58.551Z",
-      "updatedAt": "2026-10-05T14:28:58.551Z"
-    },
-    {
       "name": "Bad Butter",
       "company": "Bad Butter",
       "title": "Bakery Owner / Manager",
@@ -1141,16 +1115,6 @@
     }
   ],
   "activities": [
-    {
-      "id": "act-7354b6a0",
-      "userId": "usr-demo-1",
-      "type": "note",
-      "description": "Created new lead: Monal Lahore (Monal Lahore) - Stage: New",
-      "entityType": "lead",
-      "entityId": "lead-1f23f7da",
-      "entityName": "Monal Lahore",
-      "createdAt": "2026-10-05T14:28:58.551Z"
-    },
     {
       "id": "act-a8ca0339",
       "userId": "usr-demo-1",

@@ -93,8 +93,6 @@ export interface MapLeadPlace {
   userRatingCount?: number;
   googleMapsUri?: string;
   category?: string;
-  source?: 'google_places' | string;
-  businessStatus?: string;
   location?: {
     latitude: number;
     longitude: number;
@@ -105,7 +103,6 @@ export interface MapLeadPlace {
 
 export interface MapSearchResponse {
   success: boolean;
-  source?: 'google_places' | string;
   places: MapLeadPlace[];
   query: string;
   location: string;

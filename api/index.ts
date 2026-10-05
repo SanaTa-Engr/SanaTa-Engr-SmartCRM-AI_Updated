@@ -1,9 +1,6 @@
 import app from '../server';
 
 export default function handler(req: any, res: any) {
-  const incomingUrl = req.url || '';
-  const queryString = incomingUrl.includes('?') ? incomingUrl.slice(incomingUrl.indexOf('?')) : '';
-
   // If req.url is already a specific api path (e.g. /api/maps/search?...)
   if (req.url && req.url.startsWith('/api/') && req.url.length > 5) {
     return app(req, res);
@@ -19,7 +16,7 @@ export default function handler(req: any, res: any) {
 
   for (const candidate of candidates) {
     if (candidate && typeof candidate === 'string' && candidate.startsWith('/api/') && candidate.length > 5) {
-      req.url = candidate.includes('?') ? candidate : candidate + queryString;
+      req.url = candidate;
       return app(req, res);
     }
   }

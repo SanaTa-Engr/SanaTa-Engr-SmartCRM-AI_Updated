@@ -156,7 +156,7 @@ export function LeadImportModal({
       'Samantha Reed,CloudScale Systems,samantha.reed@cloudscale.io,+1 (555) 234-5678,VP of Infrastructure,New,Inbound Web,45000,85,Schedule intro qualification call\n' +
       'David Chen,Nexis Logistics,david.chen@nexislogistics.com,+1 (555) 876-5432,Director of Operations,Contacted,Outbound SDR,32000,72,Send custom workflow teardown\n' +
       'Elena Rostova,Apex FinTech,elena@apexfintech.co,+1 (555) 345-9876,Head of Product,Qualified,Referral,75000,90,Present enterprise security overview\n' +
-      'Marcus Brody,Horizon Health Systems,marcus.b@horizonhealth.org,+1 (555) 432-1098,Chief Digital Officer,Proposal,Partner Ecosystem,120000,94,Deliver final MSA & SLA contract\n' +
+      'Marcus Brody,Vanguard Health,marcus.b@vanguardhealth.org,+1 (555) 432-1098,Chief Digital Officer,Proposal,Partner Ecosystem,120000,94,Deliver final MSA & SLA contract\n' +
       'Rachel Kim,Starlight Media,rachel@starlightmedia.net,+1 (555) 654-3210,Growth Lead,New,Conference,28000,68,Follow up after SaaS Expo keynote';
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

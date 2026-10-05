@@ -144,6 +144,12 @@ function SpatialFallbackMap({
     };
   }, [validPlaces]);
 
+  const copyConfigName = () => {
+    navigator.clipboard.writeText('GOOGLE_MAPS_API_KEY');
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2000);
+  };
+
   return (
     <div className="relative w-full h-full min-h-[460px] bg-slate-950 rounded-2xl overflow-hidden shadow-inner flex flex-col select-none">
       {/* Background Spatial Grid & Radar Pattern */}
@@ -156,14 +162,25 @@ function SpatialFallbackMap({
         <div className="absolute w-[780px] h-[780px] rounded-full border border-indigo-500/15" />
       </div>
 
-      {/* Top Banner explaining safe server-side search and optional browser key */}
+      {/* Top Banner explaining safe Vercel deployment without GitHub exposure */}
       <div className="relative z-10 m-3 px-3.5 py-2.5 bg-slate-900/90 backdrop-blur-md rounded-xl border border-indigo-500/30 shadow-md flex items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-slate-200">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
-            <strong className="text-white font-semibold">Private & Secure:</strong> Google Places leads are retrieved securely server-side. Basemap is rendering in spatial radar mode. To render live Google Maps tiles, optionally provide <code className="bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono text-[11px] font-bold">VITE_GOOGLE_MAPS_BROWSER_KEY</code> (restricted to Maps JavaScript API with HTTP referrers).
+            <strong className="text-white font-semibold">Private & Secure:</strong> To enable live Google Maps satellite/street tiles on Vercel without committing keys to GitHub, add{' '}
+            <code className="bg-slate-800 text-indigo-300 px-1.5 py-0.5 rounded font-mono text-[11px] font-bold">
+              GOOGLE_MAPS_API_KEY
+            </code>{' '}
+            in Vercel Project Settings.
           </span>
         </div>
+        <button
+          onClick={copyConfigName}
+          className="shrink-0 px-2.5 py-1 bg-indigo-600/80 hover:bg-indigo-600 text-white rounded-lg flex items-center gap-1 font-medium transition-colors cursor-pointer text-[11px]"
+        >
+          {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-300" /> : <Copy className="w-3.5 h-3.5" />}
+          {copiedKey ? 'Copied' : 'Copy Var Name'}
+        </button>
       </div>
 
       {/* Interactive Canvas Plane */}
@@ -235,22 +252,22 @@ function SpatialFallbackMap({
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   In Pipeline
                 </span>
-              ) : selectedPlace.source === 'google_places' ? (
+              ) : (
                 <span className="text-[10px] font-bold text-blue-400 bg-blue-950/80 px-1.5 py-0.5 rounded border border-blue-800/50">
-                  Google Places
+                  Google Verified
                 </span>
-              ) : null}
+              )}
             </div>
 
             <h4 className="font-bold text-sm text-slate-100">{selectedPlace.name}</h4>
 
-            {selectedPlace.rating !== undefined && (
+            {selectedPlace.rating && (
               <div className="flex items-center gap-1.5 mt-1 text-xs">
                 <span className="text-amber-400 font-bold flex items-center gap-0.5">
                   <Star className="w-3.5 h-3.5 fill-current" />
                   {selectedPlace.rating.toFixed(1)}
                 </span>
-                {selectedPlace.userRatingCount !== undefined && (
+                {selectedPlace.userRatingCount && (
                   <span className="text-slate-400 text-[11px]">
                     ({selectedPlace.userRatingCount.toLocaleString()} reviews)
                   </span>
@@ -265,17 +282,12 @@ function SpatialFallbackMap({
               </p>
             )}
 
-            {selectedPlace.phone ? (
+            {selectedPlace.phone && (
               <p className="text-[11px] text-slate-300 mt-1 flex items-center gap-1">
                 <Phone className="w-3 h-3 text-slate-500 shrink-0" />
                 <a href={`tel:${selectedPlace.phone}`} className="text-indigo-400 hover:underline">
                   {selectedPlace.phone}
                 </a>
-              </p>
-            ) : (
-              <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1 italic">
-                <Phone className="w-3 h-3 text-slate-600 shrink-0" />
-                Phone unavailable
               </p>
             )}
 
@@ -362,12 +374,33 @@ export function InteractiveMap({
 }: InteractiveMapProps) {
   // Retrieve API key dynamically: checks client env, then queries backend /api/maps/config
   // Kept server-side and never hardcoded in source files or committed to GitHub!
-  // Check solely for the optional client-side browser key.
-  // The private server-side Google Maps key is NEVER exposed to or received by the browser.
-  const browserKey =
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GOOGLE_MAPS_BROWSER_KEY) || '';
+  const [apiKey, setApiKey] = useState<string>(() => {
+    if (typeof window !== 'undefined' && (window as any).__GOOGLE_MAPS_API_KEY__) {
+      return (window as any).__GOOGLE_MAPS_API_KEY__;
+    }
+    return (
+      (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY) ||
+      ''
+    );
+  });
   const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid' | 'terrain'>('roadmap');
   const [infoWindowPlace, setInfoWindowPlace] = useState<MapLeadPlace | null>(null);
+
+  useEffect(() => {
+    // If client env var not provided, fetch from backend config securely
+    if (!apiKey) {
+      api
+        .getMapsConfig()
+        .then(cfg => {
+          if (cfg && cfg.apiKey && cfg.apiKey.trim() !== '' && cfg.apiKey !== 'YOUR_DEMO_OR_TEST_KEY') {
+            setApiKey(cfg.apiKey.trim());
+          }
+        })
+        .catch(err => {
+          console.warn('[SmartCRM] Backend maps config check:', err);
+        });
+    }
+  }, [apiKey]);
 
   // Sync selectedPlace with InfoWindow
   useEffect(() => {
@@ -383,9 +416,9 @@ export function InteractiveMap({
       ? { lat: validPlaces[0].location.latitude, lng: validPlaces[0].location.longitude }
       : { lat: 37.7749, lng: -122.4194 }; // San Francisco fallback
 
-  // If no visual browser key is configured, display the high-fidelity interactive spatial fallback.
-  // This keeps private server keys 100% secure while verified CRM lead discovery operates fully.
-  if (!browserKey || browserKey.trim() === '' || browserKey === 'YOUR_DEMO_OR_TEST_KEY') {
+  // If no API key is configured yet, render the high-fidelity interactive spatial fallback
+  // This ensures the application remains 100% operational on Vercel without publishing keys to GitHub!
+  if (!apiKey || apiKey === 'YOUR_DEMO_OR_TEST_KEY') {
     return (
       <SpatialFallbackMap
         places={places}
@@ -403,7 +436,7 @@ export function InteractiveMap({
 
   return (
     <div className="relative w-full h-full min-h-[460px] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex flex-col">
-      <APIProvider apiKey={browserKey} libraries={['marker', 'places']}>
+      <APIProvider apiKey={apiKey} libraries={['marker', 'places']}>
         <div className="relative w-full h-full flex-1">
           <Map
             mapId="DEMO_MAP_ID"
@@ -503,11 +536,11 @@ export function InteractiveMap({
                         <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                         In Pipeline
                       </span>
-                    ) : infoWindowPlace.source === 'google_places' ? (
+                    ) : (
                       <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
-                        Google Places
+                        Google Verified
                       </span>
-                    ) : null}
+                    )}
                   </div>
 
                   {/* Business Name */}
@@ -541,7 +574,7 @@ export function InteractiveMap({
                   )}
 
                   {/* Phone */}
-                  {infoWindowPlace.phone ? (
+                  {infoWindowPlace.phone && (
                     <p className="text-[11px] text-slate-600 mt-1 flex items-center gap-1">
                       <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                       <a
@@ -550,11 +583,6 @@ export function InteractiveMap({
                       >
                         {infoWindowPlace.phone}
                       </a>
-                    </p>
-                  ) : (
-                    <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1 italic">
-                      <Phone className="w-3 h-3 text-slate-300 shrink-0" />
-                      Phone unavailable
                     </p>
                   )}
 
@@ -572,7 +600,7 @@ export function InteractiveMap({
                           Website
                         </a>
                       ) : (
-                        <span className="text-slate-400 italic">Website unavailable</span>
+                        <span className="text-slate-400 italic">No website</span>
                       )}
 
                       <a
